@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/ask-elad/server_proxy/internal/forwarder"
+	"github.com/ask-elad/server_proxy/internal/observ"
+	_ "github.com/ask-elad/server_proxy/internal/observ"
 )
 
 func HandleCONNECT(client net.Conn, res *Result) {
@@ -30,5 +32,16 @@ func HandleCONNECT(client net.Conn, res *Result) {
 		return
 	}
 
-	forwarder.Tunnel(client, targetConn)
+	bytesCopied, _ := forwarder.Tunnel(client, targetConn)
+
+	observ.LogRequest(observ.RequestLog{
+		Client: client.RemoteAddr().String(),
+		Method: "CONNECT",
+		Target: targetAddr,
+		Path:   "",
+		Action: "ALLOW",
+		Status: 200,
+		Bytes:  bytesCopied,
+	})
+
 }

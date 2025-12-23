@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ask-elad/server_proxy/internal/forwarder"
+	"github.com/ask-elad/server_proxy/internal/observ"
 )
 
 type HTTPRequest struct {
@@ -80,5 +81,16 @@ func HandleHTTP(client net.Conn, res *Result) {
 	}()
 
 	// target → client (response)
-	forwarder.Tunnel(client, targetConn)
+	bytesCopied, _ := forwarder.Tunnel(client, targetConn)
+
+	observ.LogRequest(observ.RequestLog{
+		Client: client.RemoteAddr().String(),
+		Method: req.Method,
+		Target: req.Target,
+		Path:   req.Path,
+		Action: "ALLOW",
+		Status: 200,
+		Bytes:  bytesCopied,
+	})
+
 }

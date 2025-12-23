@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func Tunnel(a, b net.Conn) {
+func Tunnel(a, b net.Conn) (int64, error) {
 	aTCP, _ := a.(*net.TCPConn)
 	bTCP, _ := b.(*net.TCPConn)
 
@@ -20,4 +20,5 @@ func Tunnel(a, b net.Conn) {
 	if aTCP != nil {
 		aTCP.CloseWrite()
 	}
+	return io.Copy(a, b)
 }
