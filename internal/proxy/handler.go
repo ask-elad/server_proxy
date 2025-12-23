@@ -9,7 +9,7 @@ import (
 	"github.com/ask-elad/server_proxy/internal/protocol"
 )
 
-func Handle(client net.Conn, targetAddr string) {
+func Handle(client net.Conn) {
 	id := time.Now().UnixNano()
 	log := func(msg string) {
 		fmt.Printf("[conn %d] %s\n", id, msg)

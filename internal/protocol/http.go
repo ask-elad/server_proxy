@@ -5,6 +5,8 @@ import (
 	"net"
 	"net/url"
 	"strings"
+
+	"github.com/ask-elad/server_proxy/internal/forwarder"
 )
 
 type HTTPRequest struct {
@@ -63,9 +65,6 @@ func HandleHTTP(client net.Conn, res *Result) {
 		return
 	}
 
-	clientTCP, _ := client.(*net.TCPConn)
-	targetTCP, _ := targetConn.(*net.TCPConn)
-
 	rewrittenFirstLine := req.Method + " " + req.Path + " " + req.Version + "\r\n"
 	_, err = targetConn.Write([]byte(rewrittenFirstLine))
 	if err != nil {
@@ -75,14 +74,11 @@ func HandleHTTP(client net.Conn, res *Result) {
 
 	go func() {
 		_, _ = io.Copy(targetConn, res.Reader)
-		if targetTCP != nil {
-			targetTCP.CloseWrite()
+		if tcp, ok := targetConn.(*net.TCPConn); ok {
+			tcp.CloseWrite()
 		}
 	}()
 
-	_, _ = io.Copy(client, targetConn)
-
-	if clientTCP != nil {
-		clientTCP.CloseWrite()
-	}
+	// target → client (response)
+	forwarder.Tunnel(client, targetConn)
 }
