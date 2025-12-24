@@ -7,6 +7,7 @@ type Config struct {
 	DialTimeout time.Duration
 	ConnTimeout time.Duration
 	Verbose     bool
+	BlockedFile string
 }
 
 func Default() Config {
@@ -15,5 +16,6 @@ func Default() Config {
 		DialTimeout: 10 * time.Second,
 		ConnTimeout: 5 * time.Minute,
 		Verbose:     false,
+		BlockedFile: "",
 	}
 }

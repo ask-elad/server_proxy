@@ -15,6 +15,7 @@ func Execute() (Config, error) {
 		dialTimeout time.Duration
 		connTimeout time.Duration
 		verbose     bool
+		blockedFile string
 	)
 
 	rootCmd := &cobra.Command{
@@ -37,12 +38,14 @@ func Execute() (Config, error) {
 			if cfg.ListenAddr == "" {
 				return errors.New("listen address cannot be empty")
 			}
+			if blockedFile != "" {
+				cfg.BlockedFile = blockedFile
+			}
 
 			return nil
 		},
 	}
 
-	// Flags
 	rootCmd.Flags().StringVar(
 		&listenAddr,
 		"listen",
@@ -70,7 +73,13 @@ func Execute() (Config, error) {
 		false,
 		"Enable verbose logging",
 	)
-	// Execute cobra
+	rootCmd.Flags().StringVar(
+		&blockedFile,
+		"blocked",
+		"",
+		"Path to blocked domains/IPs file",
+	)
+
 	if err := rootCmd.Execute(); err != nil {
 		return Config{}, err
 	}
