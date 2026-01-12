@@ -12,7 +12,6 @@ Built with the tools and technologies you love.
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-  - [Usage](#usage)
   - [Testing](#testing)
 
 ---
@@ -93,3 +92,36 @@ The flags
 
 ```
 
+# Testing
+
+The proxy was tested manually and programmatically to validate correctness, stability, and flag behavior across HTTP, HTTPS, and TCP traffic.
+
+---
+
+**Test**
+1)Started the proxy with default settings
+Sent HTTP requests through the proxy using `curl`
+
+```bash
+go run ./cmd/proxy --listen :8080
+curl -x http://localhost:8080 http://example.com
+```
+
+Result
+
+Requests were successfully forwarded to the upstream server
+Responses were streamed back correctly
+No request buffering or data corruption observed
+
+
+2)Verified HTTPS support via the CONNECT method
+Tested with multiple HTTPS endpoints
+```bash
+curl -x http://localhost:8080 https://example.com
+```
+
+Result
+
+CONNECT tunnels were established correctly
+TLS handshake occurred end-to-end without interception
+Encrypted traffic passed transparently through the proxy
